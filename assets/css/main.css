@@ -2449,6 +2449,26 @@ h1, h2, h3, h4, h5 {
   font-family: 'Inter', sans-serif !important;
   font-weight: 400;
 }
+/* Subtítulos (debajo de títulos principales) */
+header.major > p,
+#header > p {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  text-transform: none; /* evita que se quede en mayúsculas si la plantilla lo fuerza */
+}
+
+/* Forzar tipografía en párrafos de la sección principal (home intro) */
+#banner .content p {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  line-height: 1.6;
+}
+
+
+
 
 /* Forzar tamaño de imagenes igual en proyectos */
 .posts .image img {
