@@ -2480,6 +2480,30 @@ header.major > p,
 
 
 
+/* ======================
+   Estilos tags (para Product Experience & Data Cases)
+   ====================== */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tag {
+  background: #f3f4f6;
+  color: #333;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+body {
+  border: 5px solid red !important;
+}
+
 
 
 
