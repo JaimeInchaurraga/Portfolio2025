@@ -63,6 +63,62 @@
       border-radius: 20px;
       font-weight: 500;
     }
+
+    /* ===== Shelf Section (Education & Certifications) ===== */
+    .shelf {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      justify-items: center;
+      position: relative;
+      margin-top: 3rem;
+      padding-bottom: 3rem;
+    }
+    .shelf::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: #1a2456;
+      border-radius: 3px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    }
+    .shelf-card {
+      background: #fff;
+      border: 1px solid #e6e6e6;
+      border-radius: 10px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 260px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .shelf-card img {
+      max-height: 60px;
+      margin-bottom: 1rem;
+      object-fit: contain;
+    }
+    .shelf-card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+    .shelf-card p {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 0.5rem;
+    }
+    .badge {
+      display: inline-block;
+      background: #1a2456;
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      margin-top: 0.5rem;
+    }
   </style>
 </head>
 <body class="is-preload">
@@ -100,7 +156,6 @@
               <li>Coordinating with the operations team and other departments to align on product-related tasks and strategies.</li>
               <li>Supporting data-related initiatives, including data collection, analysis, and reporting to guide product improvements.</li>
               <li>Actively participating in brainstorming sessions to propose innovative solutions and enhance product offerings.</li>
-
             </ul>
             <div class="tags">
               <span class="tag">Backlog Management</span>
@@ -147,8 +202,6 @@
               <li>Functional documentation and backlog ownership.</li>
               <li>Close relationship with UX teams to define visual proposals for multiple products.</li>
               <li>QA in test, pre-production and production environments through tools such as Postman, TestFlight or DBeaver</li>
-              
-              
             </ul>
             <div class="tags">
               <span class="tag">Blockchain</span>
@@ -178,6 +231,60 @@
             </div>
           </div>
 
+          <!-- Education & Certifications -->
+          <section>
+            <header class="major">
+              <h1>Education & Certifications</h1>
+              <p>Key milestones in my learning journey: from formal education to specialized certifications.</p>
+            </header>
+
+            <div class="shelf">
+              <!-- Education fila -->
+              <div class="shelf-card">
+                <img src="images/thebridge_logo.jpeg" alt="The Bridge Logo">
+                <h3>Master in Data Analysis & Science</h3>
+                <p>The Bridge | 2023 – 2024</p>
+                <span class="badge">Education</span>
+              </div>
+
+              <div class="shelf-card">
+                <img src="images/thepower_logo.jpeg" alt="The Power MBA Logo">
+                <h3>Postgraduate in Digital Marketing</h3>
+                <p>The Power MBA | 2019 – 2020</p>
+                <span class="badge">Education</span>
+              </div>
+
+              <div class="shelf-card">
+                <img src="images/ufv_logo.jpeg" alt="UFV Logo">
+                <h3>Bachelor's in Marketing</h3>
+                <p>Univ. Francisco de Vitoria | 2014 – 2018</p>
+                <span class="badge">Education</span>
+              </div>
+
+              <!-- Certifications fila -->
+              <div class="shelf-card">
+                <img src="images/europeanscrum_logo.jpeg" alt="European Scrum Logo">
+                <h3>Expert Product Owner</h3>
+                <p>European Scrum | 2022</p>
+                <span class="badge">Certification</span>
+              </div>
+
+              <div class="shelf-card">
+                <img src="images/consensys_logo.jpeg" alt="Consensys Logo">
+                <h3>Blockchain Essentials</h3>
+                <p>Consensys | 2021</p>
+                <span class="badge">Certification</span>
+              </div>
+
+              <div class="shelf-card">
+                <img src="images/thepower_logo.jpeg" alt="The Power MBA Logo">
+                <h3>Agile Foundations</h3>
+                <p>The Power MBA | 2022</p>
+                <span class="badge">Certification</span>
+              </div>
+            </div>
+          </section>
+
         </section>
       </div>
     </div>
@@ -194,7 +301,6 @@
             <li><a href="data-cases.html">Data Cases</a></li>
             <li><a href="product-experience.html">Product Experience</a></li>
             <li><a href="resume.pdf">Resume</a></li>
-            <li><a href="contact.html">Contact</a></li>
           </ul>
         </nav>
 
