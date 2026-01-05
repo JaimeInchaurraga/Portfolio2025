@@ -1,0 +1,441 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <title>JAIBOT — Personal AI Assistant</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="JAIBOT Lite — Personal AI assistant built with local-first architecture and workflow automation." />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+  </head>
+
+  <body class="is-preload">
+
+    <div id="wrapper">
+
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+
+          <!-- Header -->
+          <header id="header">
+            <a href="automations-cases.html" class="logo">
+              ← Back to Automations
+            </a>
+          </header>
+
+          <!-- Content -->
+          <section>
+            <header class="major">
+              <h1>JAIBOT — Personal AI Assistant</h1>
+              <p>
+                A personal AI assistant designed to combine contextual knowledge about my professional profile
+                with practical automation capabilities for everyday tasks.
+              </p>
+            </header>
+
+            <!-- OVERVIEW -->
+            <h2>Project Overview</h2>
+
+            <p>
+              The idea behind JAIBOT was born from two recurring problems I kept encountering, both as a professional
+              and as a curious builder exploring automation and AI.
+            </p>
+
+            <h3>Problem 1 — Static personal profiles</h3>
+            <p>
+              When you want to introduce yourself professionally, you usually rely on static formats:
+              CVs, portfolios, LinkedIn profiles or presentations.
+              While useful, they often lack flexibility and depth.
+              What happens when someone wants to explore a very specific aspect of your experience?
+              Or ask follow-up questions tailored to their own interests?
+            </p>
+
+            <p>
+              This is where AI shows one of its greatest strengths: contextual understanding and personalization.
+              The idea was to create an assistant capable of answering questions about me,
+              my background, skills and projects, adapting responses dynamically
+              based on a rich, curated context.
+              A recruiter, a hiring manager or anyone interested in my profile
+              could explore it in a much more natural and interactive way.
+            </p>
+
+            <h3>Problem 2 — Efficiency and focus</h3>
+            <p>
+              As professionals, our goal is to become better, more efficient and to focus our time
+              on what really matters.
+              But day-to-day tasks keep piling up: emails, task organization, research, reminders,
+              monitoring tools and events.
+            </p>
+
+            <p>
+              I started exploring the idea of a personal assistant capable of listening to events,
+              processing inputs and either informing me or taking action based on my preferences.
+              Connected to the right tools, such an assistant could reduce friction and centralize
+              many workflows in one place.
+              With AI, there are (almost) no real limits to what this assistant could do.
+            </p>
+
+            <p>
+              Combining both ideas led to a single solution:
+              a unified assistant that works both as an interactive professional profile
+              and as a practical personal automation hub.
+              This is how JAIBOT — <em>Jaime’s assistant</em> — was born.
+            </p>
+
+            <!-- IMAGE -->
+            <span class="image fit">
+              <a href="images/jaibot_overview.png" target="_blank">
+                <img src="images/jaibot_overview.png" alt="JAIBOT overview" />
+              </a>
+            </span>
+
+            <!-- TECHNICAL OVERVIEW -->
+            <h2>Technical Overview</h2>
+
+            <p>
+              JAIBOT Lite is built around a local-first architecture with a strong focus on flexibility,
+              modularity and low operational cost.
+              The core logic is orchestrated using workflow automation, allowing the assistant to grow
+              and evolve incrementally.
+            </p>
+
+            <ul>
+              <li><strong>Streamlit</strong> acts as the user-facing interface.</li>
+              <li><strong>n8n</strong> orchestrates the automation flows and decision logic.</li>
+              <li><strong>LLMs</strong> handle natural language understanding and response generation.</li>
+              <li><strong>Local services</strong> are prioritized to reduce cost and maintain control.</li>
+            </ul>
+
+            <p>
+              The user interacts with JAIBOT through a simple web interface.
+              Requests are sent to n8n, which manages validation, routing,
+              AI execution and response handling before sending the final answer back to the UI.
+            </p>
+
+            <!-- IMAGE -->
+            <span class="image fit">
+              <a href="images/jaibot_architecture.png" target="_blank">
+                <img src="images/jaibot_architecture.png" alt="JAIBOT architecture" />
+              </a>
+            </span>
+
+            <!-- ARCHITECTURE CONSTRAINTS -->
+            <h2>Architecture Decisions & Constraints</h2>
+
+            <p>
+              I am fully aware that certain parts of the architecture could be more efficient
+              or scalable in a production-grade environment.
+              However, it is important to understand the constraints and goals of this project.
+            </p>
+
+            <p>
+              One of the main challenges was keeping the solution as low-cost as possible.
+              For that reason, most services run locally and the system avoids
+              unnecessary cloud dependencies.
+              This local-first approach introduces certain limitations and additional complexity,
+              especially when it comes to availability and long-running services.
+            </p>
+
+            <p>
+              In future phases, once I reach the level of knowledge and confidence I aim for
+              in automation and system design,
+              I plan to explore cloud deployments and hybrid setups.
+              This would allow JAIBOT to operate 24/7 without local constraints
+              and open the door to more advanced use cases.
+            </p>
+
+            <!-- WORKFLOW DETAILS -->
+            <h2>Workflow Breakdown</h2>
+
+<p>
+  JAIBOT Lite is not just a chatbot sitting behind a UI.
+  Under the hood, it is a small orchestration system that connects a conversational interface,
+  an automation engine and an LLM platform designed to handle context, state and multi-step reasoning.
+  The complexity is intentionally hidden from the user, but very present in the architecture.
+</p>
+
+<h3>0. High-level architecture</h3>
+
+<p>
+  The system is built around four core layers:
+</p>
+
+<ul>
+  <li><strong>Streamlit</strong> as the user-facing interface.</li>
+  <li><strong>n8n</strong> as the orchestration and automation engine.</li>
+  <li><strong>OpenAI Platform (Assistants API)</strong> as the conversational and reasoning core.</li>
+  <li><strong>External tools & services</strong> (Gmail, Calendar, Notion, etc.) connected via APIs.</li>
+</ul>
+
+<p>
+  The user interacts only with Streamlit.
+  Everything else — validation, context management, retries, AI execution and integrations —
+  is handled asynchronously through workflows.
+</p>
+
+<h3>1. Entry point — Webhook & request validation</h3>
+
+<p>
+  Every interaction starts with a webhook exposed by n8n.
+  Streamlit sends the user message as a structured payload, which immediately goes through
+  a validation layer.
+</p>
+
+<p>
+  At this stage, the workflow checks:
+</p>
+
+<ul>
+  <li>That the request is authorized (simple auth key / environment check).</li>
+  <li>That the payload structure is correct.</li>
+  <li>That mandatory fields (message, context flags, metadata) are present.</li>
+</ul>
+
+<p>
+  Invalid or malformed requests are rejected early to avoid unnecessary AI calls
+  and reduce cost and noise in the system.
+</p>
+
+<h3>2. Context management & identity awareness</h3>
+
+<p>
+  One of the key design decisions was to make JAIBOT aware of <em>who</em> is talking to it.
+  The assistant behaves differently depending on whether the user is:
+</p>
+
+<ul>
+  <li>A generic external user exploring my profile.</li>
+  <li>Or myself, using JAIBOT as a personal assistant.</li>
+</ul>
+
+<p>
+  This differentiation is handled through contextual signals passed to the LLM,
+  not through hardcoded logic.
+  The idea is to let the assistant reason based on context, not on rigid condition trees.
+</p>
+
+<h3>3. OpenAI Assistants API (not a “vanilla” LLM call)</h3>
+
+<p>
+  Instead of calling a raw completion or chat model, JAIBOT uses the
+  <strong>OpenAI Assistants API</strong>.
+  This was a deliberate choice.
+</p>
+
+<p>
+  The Assistants API allows:
+</p>
+
+<ul>
+  <li>Persistent threads to maintain conversational state.</li>
+  <li>Rich system instructions that define behavior and boundaries.</li>
+  <li>External documents and context files attached to the assistant.</li>
+  <li>A clear separation between user input and assistant reasoning.</li>
+</ul>
+
+<p>
+  This means that API calls are structurally different from a simple “prompt → response” flow.
+  Each interaction involves:
+</p>
+
+<ul>
+  <li>Creating or reusing a thread.</li>
+  <li>Appending a new message to that thread.</li>
+  <li>Triggering a run.</li>
+  <li>Polling for completion.</li>
+  <li>Fetching and post-processing the assistant output.</li>
+</ul>
+
+<p>
+  While more complex, this approach provides much better control over context,
+  behavior consistency and long-term scalability.
+</p>
+
+<h3>4. Orchestration logic in n8n</h3>
+
+<p>
+  n8n acts as the brain of the system.
+  It orchestrates the entire lifecycle of each interaction:
+</p>
+
+<ul>
+  <li>Creating threads and runs.</li>
+  <li>Waiting and polling for execution status.</li>
+  <li>Handling timeouts and retries.</li>
+  <li>Cleaning and formatting responses.</li>
+</ul>
+
+<p>
+  Conditional nodes are used to manage asynchronous behavior.
+  If a run is not completed, the workflow waits and checks again,
+  avoiding race conditions or partial responses.
+</p>
+
+<p>
+  This approach trades simplicity for reliability — a conscious decision
+  aligned with real-world automation constraints.
+</p>
+
+<h3>5. External tools & API integrations (work in progress)</h3>
+
+<p>
+  Beyond conversational capabilities, JAIBOT is designed to act as a true assistant
+  connected to my daily tools:
+</p>
+
+<ul>
+  <li>Gmail</li>
+  <li>Google Calendar</li>
+  <li>Notion</li>
+  <li>Other services exposed via APIs</li>
+</ul>
+
+<p>
+  The technical groundwork is already in place:
+</p>
+
+<ul>
+  <li>Credentials management.</li>
+  <li>Secure API connections.</li>
+  <li>Event-based triggers.</li>
+</ul>
+
+<p>
+  What remains is the most sensitive part:
+  ensuring that the AI makes the <strong>right decision at the right time</strong>.
+</p>
+
+<p>
+  A single ambiguous word in a message — especially when interacting with clients or external contacts —
+  could lead to incorrect or harmful actions.
+  Because of that, this layer requires extremely tight constraints,
+  clear intent detection and conservative decision-making.
+</p>
+
+<p>
+  This is currently the main focus of iteration and refinement.
+</p>
+
+<h3>6. Local-first architecture & infrastructure challenges</h3>
+
+<p>
+  One of the biggest constraints — and learning opportunities — of JAIBOT Lite
+  is that most of the system runs locally.
+</p>
+
+<p>
+  To expose local services (like n8n) securely, the project uses
+  <strong>Cloudflare Tunnel</strong> as a bridge between local infrastructure
+  and external APIs.
+</p>
+
+<p>
+  This setup introduces real-world limitations:
+</p>
+
+<ul>
+  <li>The system depends on my machine being powered on.</li>
+  <li>Network stability becomes a critical factor.</li>
+  <li>Long-running automations are harder to guarantee.</li>
+</ul>
+
+<p>
+  However, working under these constraints has been extremely valuable.
+  It mirrors the challenges faced by individuals or small teams
+  without access to large-scale infrastructure.
+</p>
+
+<p>
+  Understanding how to adapt, simplify and prioritize under these conditions
+  is part of the learning goal of this project.
+</p>
+
+<h3>7. Proof of Concept today, scalable system tomorrow</h3>
+
+<p>
+  JAIBOT Lite is intentionally a <strong>proof of concept</strong>.
+  The objective is not perfection, but learning through real implementation.
+</p>
+
+<p>
+  In a future phase, the plan is to:
+</p>
+
+<ul>
+  <li>Move core services to cloud infrastructure.</li>
+  <li>Ensure 24/7 availability.</li>
+  <li>Harden decision-making logic.</li>
+  <li>Expand integrations safely.</li>
+</ul>
+
+<p>
+  For now, the focus remains on understanding the full lifecycle of an AI-driven system:
+  from UX to orchestration, from infrastructure constraints to responsible automation.
+</p>
+
+
+            <!-- IMAGE -->
+            <span class="image fit">
+              <a href="images/jaibot_workflow.png" target="_blank">
+                <img src="images/jaibot_workflow.png" alt="JAIBOT workflow in n8n" />
+              </a>
+            </span>
+
+          </section>
+
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div id="sidebar">
+        <div class="inner">
+
+          <nav id="menu">
+            <header class="major"><h2>Menu</h2></header>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="product-experience.html">Product Experience</a></li>
+              <li><a href="data-cases.html">Data Cases</a></li>
+              <li><a href="automation-cases.html">Automation Cases</a></li>
+              <li><a href="resume.pdf">Resume</a></li>
+            </ul>
+          </nav>
+
+          <section>
+            <header class="major"><h2>Get in touch</h2></header>
+            <ul class="contact">
+              <li class="icon brands fa-linkedin">
+                <a href="https://www.linkedin.com/in/jaimeinchaurraga/">LinkedIn</a>
+              </li>
+              <li class="icon solid fa-envelope">
+                <a href="mailto:jaimeih.94@gmail.com">jaimeih.94@gmail.com</a>
+              </li>
+              <li class="icon brands fa-github">
+                <a href="https://github.com/JaimeInchaurraga">GitHub</a>
+              </li>
+            </ul>
+          </section>
+
+          <footer id="footer">
+            <p class="copyright">&copy; Jaime Inchaurraga. 2025</p>
+          </footer>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+  </body>
+</html>
