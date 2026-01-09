@@ -1,0 +1,557 @@
+```html
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <title>JAIBOT ART — Automated Content Creation Pipeline</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="JAIBOT ART — end-to-end automation that researches a topic, generates caption + SDXL image, publishes to Instagram, and updates a Notion database." />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+  </head>
+
+  <body class="is-preload">
+
+    <div id="wrapper">
+
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+
+          <!-- Header -->
+          <header id="header">
+            <a href="automations-cases.html" class="logo">
+              ← Back to Automations
+            </a>
+          </header>
+
+          <!-- Content -->
+          <section>
+            <header class="major">
+              <h1>JAIBOT ART — Automated Content Creation Pipeline</h1>
+              <p>
+                A fully automated workflow that selects a topic, retrieves information from the web, cleans it,
+                generates written + visual content using local AI, and publishes it to Instagram — all in one flow.
+              </p>
+            </header>
+
+            <!-- OVERVIEW -->
+            <h2>Project Overview</h2>
+
+            <p>
+              The idea behind JAIBOT ART came from a very practical thought:
+              creating quality content takes time — a lot of it.
+              If you do it properly, you end up splitting the work across different roles:
+              research, copywriting, design, prompt creation, image generation, publishing, scheduling, reporting...
+            </p>
+
+            <p>
+              I wanted a process capable of automating the entire content creation cycle:
+              selecting a theme, finding reliable information online, downloading and cleaning that information,
+              generating written and visual content with LLMs and generative AI, and finally publishing automatically
+              to social networks.
+            </p>
+
+            <p>
+              The benefit is obvious:
+              huge time savings and a massive efficiency gain.
+              What usually requires marketing teams, creatives, designers, copywriters and community managers
+              can be executed inside a single automation workflow — reliably and repeatably.
+            </p>
+
+            <p>
+              In this version, I focused the project on a specific topic — Warhammer 40K (I’m a big fan).
+              But the workflow is designed so that, with small changes, it can expand to almost any topic:
+              different content sources, a different “dictionary” of themes, a new writing tone, a new visual style,
+              and you have a new content machine.
+            </p>
+
+            <!-- IMAGE (optional intro visual) -->
+            <!-- Replace the file name with your final image when you add it -->
+            <span class="image fit">
+              <a href="images/jaibotart_cover.png" target="_blank">
+                <img
+                  src="images/jaibotart_cover.png"
+                  alt="JAIBOT ART overview"
+
+                />
+              </a>
+            </span>
+
+            <h2>What this automation does (in plain words)</h2>
+
+            <p>
+              JAIBOT ART works like a content “factory”:
+              it starts from a list (a dictionary) of characters/topics,
+              selects one at random,
+              searches the internet for that character,
+              downloads the HTML from a trusted source,
+              cleans and structures the content,
+              then uses a local LLM to generate:
+              (1) a caption for Instagram with a specific tone,
+              and (2) a prompt to generate an image with a consistent art style.
+              The workflow generates the image via ComfyUI + SDXL, uploads it to the cloud,
+              publishes it automatically to Instagram using the Meta Graph API (which is a bit painful but powerful),
+              and finally updates a Notion database so the system doesn’t post the same character twice.
+            </p>
+
+            <p>
+              Tools involved in the pipeline:
+            </p>
+
+            <ul>
+              <li><strong>n8n</strong> as the orchestration layer: nodes, routing, conditions, retries, scheduling, and API calls.</li>
+              <li><strong>Brave Search API</strong> to find relevant sources automatically.</li>
+              <li><strong>Lexicanum</strong> (Warhammer wiki) as the main content source for lore.</li>
+              <li><strong>Llama 3 (local)</strong> to generate the Instagram caption and build the image prompt.</li>
+              <li><strong>ComfyUI</strong> as the image-generation engine (API-driven) using <strong>SDXL Juggernaut</strong> (high-quality SDXL model, great for cinematic lighting and realistic textures).</li>
+              <li><strong>Cloudinary</strong> to host the final image publicly (required for Instagram publishing flow).</li>
+              <li><strong>Meta Graph API</strong> to publish automatically to a Business Instagram account.</li>
+              <li><strong>Notion</strong> as the “memory layer” (database of characters + posted/not-posted state).</li>
+            </ul>
+
+            <!-- TECHNICAL OVERVIEW -->
+            <h2>Technical Overview</h2>
+
+            <p>
+              This project is basically an end-to-end automation system with three pillars:
+              (1) a content source pipeline (search → extract → clean),
+              (2) an AI generation pipeline (caption + prompt + image),
+              and (3) a publishing pipeline (hosting → Instagram → database update).
+            </p>
+
+            <p>
+              The key here is not just generating content, but doing it in a way that is:
+              predictable, repeatable, and safe to run on a schedule.
+              That’s why the workflow includes guardrails like attempt limits,
+              “already exists” checks, and token refresh automation for Instagram.
+            </p>
+
+            <!-- WORKFLOW DETAILS -->
+            <h2>Workflow Breakdown</h2>
+
+            <p>
+              Below is the full breakdown by sections, including both functional behavior
+              and the technical details behind the nodes.
+              Each section matches a specific part of the n8n workflow.
+            </p>
+
+            <!-- SECTION 1 -->
+            <h3>1) Trigger + Character selection + loop protection</h3>
+
+            <p>
+              This is the entry point of the automation.
+              It runs on a schedule (for example daily), and the workflow immediately tries to pick a character
+              that hasn’t been posted yet.
+              The biggest risk at this stage is ending up in an endless loop
+              (for example, if the random selection keeps returning characters already used),
+              so the flow includes explicit attempt control.
+            </p>
+
+            <h4>Nodes involved</h4>
+            <ul>
+              <li><strong>Schedule Trigger</strong>: starts the workflow at a defined frequency (e.g., once a day).</li>
+              <li><strong>Character Picker (Code)</strong>: selects a character/topic from a dictionary list (typically an array of names or objects).</li>
+              <li><strong>Check if Character exists in Notion</strong>: queries the Notion database to confirm whether the character is already present and/or already posted.</li>
+              <li><strong>If exist</strong>: routes the flow based on the Notion query result.</li>
+              <li><strong>Increment Attempts</strong>: increases an attempt counter when selection fails (e.g., character already used).</li>
+              <li><strong>Max Attempts NOT in the limit</strong>: checks if the attempt counter is still below a safe threshold.</li>
+              <li><strong>ERROR — Límite de intentos alcanzado</strong>: stops execution cleanly if the workflow cannot find a valid character after N tries.</li>
+            </ul>
+
+            <h4>Why this matters</h4>
+            <p>
+              In automation, “retry until success” is dangerous if you don’t put boundaries.
+              This section ensures the workflow fails safely instead of running forever.
+              It also makes debugging easier: if the limit is reached, you know your dictionary is exhausted
+              or your Notion state rules need adjusting.
+            </p>
+
+            <!-- IMAGE -->
+            <span class="image fit">
+              <!-- Replace with your final filename for this section -->
+              <a href="images/jaibotart_01_trigger_character_selection.png" target="_blank">
+                <img src="images/jaibotart_01_trigger_character_selection.png" alt="Trigger + character selection + attempt control" />
+              </a>
+            </span>
+
+            <!-- SECTION 2 -->
+            <h3>2) Web search + data extraction + cleaning (HTML → structured lore)</h3>
+
+            <p>
+              Once a valid character is selected, the workflow needs “raw material”.
+              The goal is to convert messy web content into structured text the LLM can reliably use.
+              This is where a lot of automation projects fail: if you feed raw HTML directly into an LLM,
+              you get inconsistent results, noise, and token waste.
+            </p>
+
+            <h4>Nodes involved</h4>
+            <ul>
+              <li><strong>Brave Search — Lexicanum</strong>: searches for the character specifically in the target source (Lexicanum), returning the best matching URL.</li>
+              <li><strong>Extract HTML</strong>: downloads the HTML page content from the selected URL.</li>
+              <li><strong>Clean HTML (Code)</strong>: strips navigation, scripts, irrelevant blocks, repeated UI elements and noise. Keeps the main article/lore body.</li>
+              <li><strong>Convert to JSON (Code)</strong>: structures the cleaned content into a predictable schema (e.g., <code>{ name, lore }</code>).</li>
+              <li><strong>Lore — Final clean (Code)</strong>: final normalization step: remove duplicated spaces, keep the lore complete (no aggressive truncation), and ensure consistent formatting.</li>
+            </ul>
+
+            <h4>Output produced</h4>
+            <p>
+              By the end of this stage you should have a clean object that looks conceptually like:
+            </p>
+
+            <ul>
+              <li><strong>name</strong>: the character name (normalized).</li>
+              <li><strong>lore</strong>: a clean, readable lore block with the important content only.</li>
+              <li><strong>source</strong>: the URL used (useful for traceability and debugging).</li>
+            </ul>
+
+            <p>
+              This structured payload becomes the input for the AI generation stage.
+              This is also where you win a lot of efficiency:
+              less noise means fewer tokens, more consistent outputs, and fewer “hallucinated” details.
+            </p>
+
+            <!-- IMAGE -->
+            <span class="image fit">
+            <a href="images/jaibotart_02_data_cleaning.png" target="_blank">
+                <img
+                src="images/jaibotart_02_data_cleaning.png"
+                alt="Data and format cleaning (HTML extraction and cleaning)"
+                style="width:60%; display:block; margin:0 auto;"
+                />
+            </a>
+            </span>
+
+
+            <!-- SECTION 3 -->
+            <h3>3) AI generation: caption + SDXL prompt (local Llama 3)</h3>
+
+            <p>
+              This stage transforms cleaned lore into two outputs:
+              a long-form Instagram caption (with a specific tone), and a compact “character add-on”
+              used to build the final SDXL image prompt.
+            </p>
+
+            <p>
+              A key design decision here is running the LLM locally.
+              This keeps operating cost low, keeps the pipeline private, and allows experimentation
+              without worrying about token costs on every iteration.
+            </p>
+
+            <h4>Nodes involved</h4>
+            <ul>
+              <li><strong>LLM para caption IG</strong>: sends the cleaned lore to Llama 3 with instructions for tone, structure and readability for Instagram.</li>
+              <li><strong>Character Prompt Builder</strong>: uses Llama 3 to output a single-line character descriptor (comma-separated), focused on physical traits and iconic elements (no camera, no lighting, no environment).</li>
+              <li><strong>Final SDXL Prompt</strong>: merges:
+                <ul>
+                  <li>a fixed cinematic style “base prompt”,</li>
+                  <li>the character add-on descriptor,</li>
+                  <li>and a fixed negative prompt (to block unwanted artifacts).</li>
+                </ul>
+              </li>
+            </ul>
+
+            <h4>Why split caption vs prompt builder?</h4>
+            <p>
+              Caption generation and image prompt generation are two different tasks.
+              If you combine them, quality drops:
+              the caption becomes too “prompt-like”, and the prompt becomes too verbose and narrative.
+              Separating them improves consistency and gives you better control.
+            </p>
+
+            <h4>Model choice notes (basic)</h4>
+            <p>
+              <strong>Llama 3</strong> is strong enough for summarization + tone writing and for building structured descriptors.
+              The key is not “magic prompting”, but clean input and strict output constraints
+              (like forcing the prompt builder to produce one line, comma-separated, no environment).
+            </p>
+
+             <!-- IMAGE -->
+            <span class="image fit">
+            <a href="images/jaibotart_03_llm_actions.png" target="_blank">
+                <img
+                src="images/jaibotart_03_llm_actions.png"
+                alt="LLM actions"
+                style="width:25%; display:block; margin:0 auto;"
+                />
+            </a>
+            </span>
+
+            <!-- SECTION 4 -->
+            <h3>4) Image generation via ComfyUI + SDXL Juggernaut</h3>
+
+            <p>
+              Once the final SDXL prompt is ready, the workflow generates the image using ComfyUI.
+              ComfyUI is essentially a node-based image generation engine that can be driven via API,
+              which makes it perfect for automation.
+            </p>
+
+            <p>
+              The workflow uses an SDXL model known for high-quality output:
+              <strong>Juggernaut XL</strong>.
+              In practice, this model is great when you want cinematic lighting,
+              strong textures, and a more “high-end” finish compared to many generic checkpoints.
+            </p>
+
+            <h4>Nodes involved</h4>
+            <ul>
+              <li><strong>Build Comfy Payload</strong>: constructs the JSON payload for ComfyUI’s <code>/prompt</code> endpoint (client_id + prompt graph + dynamic prompt text).</li>
+              <li><strong>ComfyUI — Queue Prompt</strong>: sends the payload to ComfyUI to start generation.</li>
+              <li><strong>Wait</strong>: gives ComfyUI time to process (SDXL can be heavy depending on hardware).</li>
+              <li><strong>Get History</strong>: polls ComfyUI to check completion status and retrieve output metadata (filename/subfolder/type).</li>
+            </ul>
+
+            <h4>Reliability detail: polling (not assuming instant results)</h4>
+            <p>
+              Image generation is not deterministic in time.
+              Sometimes it finishes quickly, sometimes slower.
+              Polling with <strong>Wait → Get History → If completed</strong> is a simple but robust pattern.
+              It avoids race conditions and avoids trying to fetch an image that isn’t ready yet.
+            </p>
+
+            <!-- IMAGE -->
+            <span class="image fit">
+            <a href="images/jaibotart_04_image_creation.png" target="_blank">
+                <img
+                src="images/jaibotart_04_image_creation.png"
+                alt="Image creation"
+                style="width:40%; display:block; margin:0 auto;"
+                />
+            </a>
+            </span>
+
+            <p>
+                In the next image I show the actual interface and the specific workflow used to generate the final image.
+                This is the real production setup, not a simplified diagram: how the prompt is built, how the image is generated
+                and how everything connects inside the tool.
+                One of the biggest upsides of working with tools like this is the insane level of creative freedom they give you.
+                You are not dependent on external companies, cloud platforms or remote servers.
+                Everything runs locally, on your own machine.
+                You fully control the process, the models, the style and the results.
+                You literally cook everything at home.
+                </p>
+
+                <p>
+                That said, not everything that shines is gold.
+                These tools come with a steep learning curve.
+                At first you genuinely think: where the hell did I get myself into?
+                But little by little things start to click.
+                Also, here the one doing the heavy lifting is your computer, and this kind of content creation pushes your GPU to its limits.
+                VAEs, upscales and high resolution passes can quickly turn your laptop into something that sounds like it is about to launch into space 🚀.
+                Powerful, flexible and fun, but definitely something to treat with respect.
+                </p>
+
+
+            <!-- IMAGE -->
+            <span class="image fit">
+            <a href="images/jaibotart_05_comfyui_flow.png" target="_blank">
+                <img
+                src="images/jaibotart_05_comfyui_flow.png"
+                alt="ComfyUI Flow"
+                style="width:100%; display:block; margin:0 auto;"
+                />
+            </a>
+            </span>
+
+            <p>
+                As you can see in the previous image, each node works by connecting to other nodes.
+                It is actually quite fun to keep wiring things together
+                until, of course, something breaks and you have absolutely no idea which damn cable is messing everything up.
+                But once you get the hang of it, interesting things start to emerge.
+                Here is another example: a reinterpretation of High Marshal Helbrecht,
+                one of the most iconic figures of the Black Templars,
+                and easily one of my favorite Adeptus Astartes chapters.
+            </p>
+
+            <span class="image fit">
+            <a href="images/jaibotart_black_templars_helbrecht.png" target="_blank">
+                <img
+                src="images/jaibotart_black_templars_helbrecht.png"
+                alt="JAIBOT Art - Black Templars reinterpretation (High Marshal Helbrecht)"
+                style="width:40%; display:block; margin:0 auto;"
+                />
+            </a>
+            </span>
+
+
+            <!-- SECTION 5 -->
+            <h3>5) Prepare data + upload image + publish to Instagram + update Notion</h3>
+
+            <p>
+              This is the “production” stage: turning internal results into a published post.
+              Instagram publishing requires a public image URL, so the workflow uploads the generated image
+              to a cloud image host first, then uses the Meta Graph API to create and publish the post.
+            </p>
+
+            <h4>Nodes involved</h4>
+            <ul>
+              <li><strong>Prepare Data (If / Wait / Code)</strong>:
+                ensures the image exists and is accessible; if needed, waits and retries.
+                The Code node typically consolidates fields (caption text, character name, generated image path).
+              </li>
+              <li><strong>View Image</strong>:
+                fetches the final generated image file from ComfyUI (usually via <code>/view</code> using filename/subfolder/type).
+              </li>
+              <li><strong>Upload Image to Cloudinary</strong>:
+                uploads the image and returns a public URL (critical requirement for Instagram).
+              </li>
+              <li><strong>Merge — Image + Caption</strong>:
+                merges the caption + cloud URL into a single payload ready for Instagram publishing.
+              </li>
+              <li><strong>Local token</strong> + <strong>Extract token from file</strong>:
+                reads a long-lived token from a local JSON file so you don’t hardcode it inside n8n nodes.
+              </li>
+              <li><strong>IG — Create Media</strong>:
+                Meta API step that creates a media container (image URL + caption).
+              </li>
+              <li><strong>IG — Publish Media</strong>:
+                publishes the created media container to the Instagram Business account.
+              </li>
+              <li><strong>Update Notion Database</strong>:
+                marks the character as “posted”, stores the post URL/id, and prevents future duplicates.
+              </li>
+            </ul>
+
+            <h4>Meta API note (because it really is a bit of a “rollo importante :)”)</h4>
+            <p>
+              Publishing to Instagram programmatically is not just “send image, done”.
+              With the Graph API, you typically do it in two steps:
+              create a media container, then publish it.
+              You also need the correct account type (Business), correct permissions,
+              and token handling that doesn’t randomly break your workflow.
+              Once it’s stable, it’s incredibly powerful: fully automated posting on a schedule.
+            </p>
+
+            <h4>Notion as the memory layer</h4>
+            <p>
+              Notion is doing a critical job here:
+              it prevents repetition and gives you control/visibility over the system state.
+              It also makes the pipeline auditable: you can see what was posted, when,
+              what caption was used, and what source generated the content.
+            </p>
+
+            <!-- IMAGE -->
+            <span class="image fit">
+              <a href="images/jaibotart_06_publish_and_update.png" target="_blank">
+                <img src="images/jaibotart_06_publish_and_update.png" alt="Upload + publish + Notion update section" />
+              </a>
+            </span>
+
+            <!-- SECTION 6 -->
+            <h3>6) Token refresh workflow (maintenance automation)</h3>
+
+            <p>
+              A pipeline like this is only “real” if it can run unattended.
+              The biggest operational risk is authentication.
+              Meta tokens expire and the publishing flow stops working if you don’t refresh them.
+            </p>
+
+            <p>
+              To solve that, I built a second automation workflow that refreshes the Instagram long-lived token
+              before it reaches the 60-day limit.
+              The refreshed token is written back to the local JSON file, so the main publishing workflow
+              always reads the latest valid token.
+            </p>
+
+            <h4>Nodes involved</h4>
+            <ul>
+              <li><strong>Schedule Trigger — Update Meta token</strong>: runs periodically (e.g., weekly) to refresh proactively.</li>
+              <li><strong>Get current token — Local</strong>: reads the current token from disk.</li>
+              <li><strong>Extract token from file</strong>: parses the JSON and extracts the token value.</li>
+              <li><strong>Get new Token from Meta</strong>: calls the token refresh endpoint.</li>
+              <li><strong>Prepare correct token format (Code)</strong>: ensures the JSON schema matches what the main workflow expects.</li>
+              <li><strong>Write / Update new Token in local file</strong>: writes the updated JSON back to disk.</li>
+            </ul>
+
+            <p>
+              This is a small detail, but it’s the difference between a “cool demo”
+              and a workflow you can actually trust to run for months.
+            </p>
+
+            <!-- IMAGE -->
+            <span class="image fit">
+              <a href="images/jaibotart_07_token_refresh.png" target="_blank">
+                <img src="images/jaibotart_07_token_refresh.png" alt="Token refresh workflow" />
+              </a>
+            </span>
+
+            <!-- CLOSING -->
+            <h2>Why this project matters</h2>
+
+            <p>
+              JAIBOT ART is not just “AI generating images”.
+              It’s a complete automation system that turns an idea into a published piece of content,
+              with state management, retries, data cleaning, local AI inference, image generation,
+              cloud hosting, and real-world API publishing constraints.
+            </p>
+
+            <p>
+              The best part is that the core pattern is reusable:
+              change the dictionary, the source, the tone and the style constraints,
+              and the same pipeline can work for any niche topic or content strategy.
+            </p>
+
+            <p>
+              For me, this project was also a way to learn by building:
+              how to design robust workflows, how to keep them stable over time,
+              and how to combine local AI with “messy” real-world systems like OAuth and Graph APIs.
+            </p>
+
+          </section>
+
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div id="sidebar">
+        <div class="inner">
+
+          <nav id="menu">
+            <header class="major"><h2>Menu</h2></header>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="product-experience.html">Product Experience</a></li>
+              <li><a href="data-cases.html">Data Cases</a></li>
+              <li><a href="automation-cases.html">Automation Cases</a></li>
+              <li><a href="resume.pdf">Resume</a></li>
+            </ul>
+          </nav>
+
+          <section>
+            <header class="major"><h2>Get in touch</h2></header>
+            <ul class="contact">
+              <li class="icon brands fa-linkedin">
+                <a href="https://www.linkedin.com/in/jaimeinchaurraga/">LinkedIn</a>
+              </li>
+              <li class="icon solid fa-envelope">
+                <a href="mailto:jaimeih.94@gmail.com">jaimeih.94@gmail.com</a>
+              </li>
+              <li class="icon brands fa-github">
+                <a href="https://github.com/JaimeInchaurraga">GitHub</a>
+              </li>
+            </ul>
+          </section>
+
+          <footer id="footer">
+            <p class="copyright">&copy; Jaime Inchaurraga. 2025</p>
+          </footer>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+  </body>
+</html>
+```
