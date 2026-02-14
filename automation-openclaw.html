@@ -1,0 +1,347 @@
+```html
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <title>My experience with OpenClaw</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="My experience using OpenAI Claw: setup, sandboxing, model choices (API vs local), and real daily use cases with Axis." />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+  </head>
+
+  <body class="is-preload">
+
+    <div id="wrapper">
+
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+
+          <!-- Header -->
+          <header id="header">
+            <a href="automation-cases.html" class="logo">
+              ← Back to Automations
+            </a>
+          </header>
+
+          <!-- Content -->
+          <section>
+            <header class="major">
+              <h1>My experience with OpenClaw</h1>
+              <p>
+                After two weeks using (and honestly wrestling with) OpenClaw, I can finally say I have a solid, working setup.
+                In this post I’ll share the key lessons from the process, the main configurations (including the models I’m running),
+                what I’m using it for today, and the next steps I’m taking.
+              </p>
+            </header>
+
+            <!-- OVERVIEW -->
+            <h2>So… what is OpenClaw?</h2>
+
+            <p>
+              Before it was called Moltbot, and it went through a few names, but in simple terms it is an agent running at computer level.
+              The easiest way to explain it is this:
+            </p>
+
+            <p>
+              <strong>It is an AI assistant that does not just answer you. It can actually act inside your machine.</strong>
+            </p>
+
+            <p>
+              A slightly more technical but still simple explanation would be this.
+              OpenClaw is a runtime that connects a language model with tools and system access.
+              The model thinks. The runtime interprets. The tools execute. And the workspace defines how everything behaves.
+            </p>
+
+            <h2>How it is built (in layers)</h2>
+
+            <p>
+              It is built in layers. You have the model, the runtime, the gateway, the workspace, and the tools.
+              I know it can sound like a lot, but if you see it as a stack, it becomes very intuitive.
+            </p>
+
+            <p>
+              Here is the simple version of what each layer does:
+            </p>
+
+            <ul>
+              <li><strong>The model</strong> is the brain. You can connect different models, either via API (OpenAI, Anthropic, etc.) or locally using something like Ollama. Later I’ll explain the tradeoffs and what I’m using right now.</li>
+              <li><strong>The runtime</strong> is the engine. It sends the context and conversation to the model, reads the structured output, decides when to call tools, and applies the rules you define.</li>
+              <li><strong>The gateway</strong> keeps the agent alive and reachable. It lets you connect channels like Telegram and talk to your assistant while it runs in the background.</li>
+              <li><strong>The workspace</strong> is where everything lives: identity files, rules, tools, context documents and logs. These documents are critical because every message you send also includes these docs as input tokens to the model.</li>
+              <li><strong>The tools</strong> are what make this real. Without tools, it is just chat. With tools, it can access files, send emails, create calendar events, modify sheets, browse the web, and more.</li>
+            </ul>
+
+            <p>
+              If I had to use a simple analogy:
+              the model is the brain, the runtime is the nervous system, the workspace is memory and personality,
+              the tools are the hands, and the gateway is the phone line.
+            </p>
+
+            <h2>How everything connects</h2>
+
+            <p>
+              This is the mental model that helped me the most:
+            </p>
+
+            <pre><code>        YOU (Telegram / CLI)
+                 |
+                 v
+              GATEWAY
+                 |
+                 v
+              RUNTIME
+         (rules + memory)
+                 |
+                 v
+              MODEL
+      (Haiku / Opus / Local)
+                 |
+        +--------+--------+
+        |                 |
+        v                 v
+     TOOLS            WORKSPACE
+ (Gmail, FS, etc.)   (Context docs)</code></pre>
+
+            <!-- INSTALLATION -->
+            <h2>Installation mindset</h2>
+
+            <p>
+              There are basically three ways to run this:
+            </p>
+
+            <ul>
+              <li>On a remote server</li>
+              <li>On your own machine</li>
+              <li>On your machine but dockerized</li>
+            </ul>
+
+            <p>
+              In my case, I installed it directly on my machine. Bare metal.
+              Yes, maybe slightly crazy. But it was intentional.
+              My mindset was lean and UAT focused.
+              I did not want to spend 1000 hours building a perfect infrastructure for something I did not fully understand yet.
+              I wanted to test fast and learn fast. If it did not fit my workflow, I could stop without having overinvested in setup.
+            </p>
+
+            <p>
+              That said, I wasn’t stupid either. And here comes the important part.
+            </p>
+
+            <h2>Wait, what is the danger?</h2>
+
+            <p>
+              When you run an agent locally, you are giving it access to your system.
+              Your files. Your data. Whatever permissions you decide to grant.
+              A bad execution could cost you.
+            </p>
+
+            <p>
+              So I went very slowly.
+            </p>
+
+            <!-- SANDBOX -->
+            <h2>Sandbox first</h2>
+
+            <p>
+              At the beginning I gave access to one single folder and started with read only.
+              Then limited write access. Then very small, very controlled tasks.
+              I invested a lot of time writing detailed context documents with clear boundaries and rules.
+              This is extremely important because those documents are sent as tokens to the model on every interaction.
+              Bad instructions mean unpredictable behaviour.
+            </p>
+
+            <p>
+              I also did stress testing. Real ones.
+              I asked it to do things it was not allowed to do. I tried to push it outside the sandbox.
+              I even tried begging it to ignore constraints just to see how it reacted.
+              Honestly, in general, I was pleasantly surprised. Not perfect, but much better than I expected.
+            </p>
+
+            <p>
+              On top of that, I added contingency measures, just in case:
+            </p>
+
+            <ul>
+              <li>Backups of important folders</li>
+              <li>Version snapshots of the workspace</li>
+              <li>Logs for key actions</li>
+              <li>Incremental permission expansion, never full access from day one</li>
+            </ul>
+
+            <!-- MODELS -->
+            <h2>Model selection: API vs local</h2>
+
+            <p>
+              This part took time. I tested several local models and several API models.
+              The one I liked the most was Anthropic, especially Opus. It is honestly impressive.
+              But there is one thing you have to keep in mind: price.
+              These models are expensive, and using them via API is significantly more expensive than having a standard subscription.
+            </p>
+
+            <p>
+              After many variations, I decided to go for a multi model setup.
+              My current stack looks like this:
+            </p>
+
+            <ul>
+              <li>
+                <strong>Base model: Haiku</strong>.
+                It is not huge in terms of parameters, but it is very agile, works well with tools and supports vision.
+                For me, vision was important. I wanted the agent to understand images and extract useful info from them.
+                It is also much cheaper, roughly three times cheaper than Sonnet. For daily tasks, it is perfect.
+              </li>
+              <li>
+                <strong>Critical layer: Opus</strong>.
+                This one is reserved for complex reasoning, long context tasks and code heavy work.
+                It is powerful, but I only use it when really necessary.
+              </li>
+              <li>
+                <strong>Local fallback: Ollama</strong>.
+                Setting this up was not easy. Running a local model sounds great, but your hardware carries everything.
+                The advantages are clear: no internet needed, no API cost, offline backup.
+                The downsides are also clear: you need a strong machine, it consumes resources and disk space.
+                One key lesson here is to check that the model has the <strong>tools</strong> tag in the Ollama library.
+                Without tool support, it simply will not work properly as an agent.
+              </li>
+            </ul>
+
+            <!-- USE CASES -->
+            <h2>What do I use it for?</h2>
+
+            <p>
+              As I said before, everything started in a sandbox. Only after passing tests did I expand.
+              Here are some of the main things I do today.
+            </p>
+
+            <h3>Communication via Telegram</h3>
+            <p>
+              The process is simple. You create a bot, validate the token, connect it to OpenClaw.
+              As long as the gateway is running, I can talk to my assistant from anywhere.
+              There is something very powerful about being at the gym, sending a task to your assistant,
+              and knowing it is executing while you train.
+            </p>
+
+            <h3>Analysis and organization of my computer</h3>
+            <p>
+              I gave access very gradually. Now it understands my project structure, my automation experiments and even my interests.
+              I can ask it to reorganize folders, analyze documents, extract insights or suggest productivity improvements based on what it sees.
+            </p>
+
+            <h3>Productivity analysis</h3>
+            <p>
+              For the last few weeks I have been working on a structured productivity system where I track time spent on work and personal tasks,
+              goals and counters. Axis, which is the name of my assistant, analyzes trends, compares time ranges and extracts insights about habits and evolution.
+              Some of the insights have been genuinely useful.
+            </p>
+
+            <h3>Recurring tasks</h3>
+            <p>
+              One of my favorite features is scheduling recurring intelligent tasks. For example:
+            </p>
+
+            <ul>
+              <li>Once a week it checks for new versions of OpenClaw, compares them with mine and analyzes potential risks.</li>
+              <li>Daily it generates structured logs of key learnings and actions from our sessions.</li>
+              <li>Every fifteen days it reviews asset prices in a portfolio and extracts insights about growth or decline.</li>
+            </ul>
+
+            <p>
+              The possibilities here are almost infinite.
+            </p>
+
+            <h3>Gmail, Calendar and Drive</h3>
+            <p>
+              Using the Google tools integration, it can analyze emails, draft responses, send them, create events, modify Sheets and create Drive files.
+              But again, this is sensitive. So I applied the same sandbox logic: activate one app at a time, read first, write later,
+              test copies, stress test, and only then expand.
+            </p>
+
+            <h3>Web navigation</h3>
+            <p>
+              It can browse, scrape and structure data. Imagine the potential when that is combined with automation and scheduled tasks.
+            </p>
+
+            <!-- SECURITY -->
+            <h2>Security</h2>
+
+            <p>
+              Not everything is perfect. There have been important security concerns, especially around prompt injection and third party extensions.
+              Weaker models are more vulnerable. Also, some community skills or tools may not be secure.
+            </p>
+
+            <p>
+              My personal opinion is simple. Use official tools from the OpenClaw author whenever possible. Be extremely cautious with external extensions.
+            </p>
+
+            <!-- CLOSING -->
+            <h2>What’s next?</h2>
+
+            <p>
+              Right now I am working on other applications built on top of this stack, but I will share that in future posts.
+            </p>
+
+            <p>
+              And genuinely, I am curious. Have you tried it seriously? Not as a trendy experiment, but actually building with it, testing it step by step.
+              I am very interested in hearing real experiences from people who are also exploring this space.
+            </p>
+
+          </section>
+
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div id="sidebar">
+        <div class="inner">
+
+          <nav id="menu">
+            <header class="major"><h2>Menu</h2></header>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="product-experience.html">Product Experience</a></li>
+              <li><a href="data-cases.html">Data Cases</a></li>
+              <li><a href="automation-cases.html">Automation Cases</a></li>
+              <li><a href="resume.pdf">Resume</a></li>
+            </ul>
+          </nav>
+
+          <section>
+            <header class="major"><h2>Get in touch</h2></header>
+            <ul class="contact">
+              <li class="icon brands fa-linkedin">
+                <a href="https://www.linkedin.com/in/jaimeinchaurraga/">LinkedIn</a>
+              </li>
+              <li class="icon solid fa-envelope">
+                <a href="mailto:jaimeih.94@gmail.com">jaimeih.94@gmail.com</a>
+              </li>
+              <li class="icon brands fa-github">
+                <a href="https://github.com/JaimeInchaurraga">GitHub</a>
+              </li>
+            </ul>
+          </section>
+
+          <footer id="footer">
+            <p class="copyright">&copy; Jaime Inchaurraga. 2025</p>
+          </footer>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+  </body>
+</html>
+```
