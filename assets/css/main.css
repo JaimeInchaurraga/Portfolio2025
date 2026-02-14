@@ -1216,6 +1216,10 @@ input[type="radio"] + label:before {
   border: 0;
   display: inline-block;
   position: relative; }
+  .image.object {
+    background-repeat: no-repeat;
+    background-position: center;
+  }
   .image img {
     border-radius: 0.375em;
     display: block; }
@@ -2274,16 +2278,59 @@ button,
 
 
     /* Ajuste del tamaño del banner como en la plantilla original */
+#banner {
+  align-items: flex-start; /* evita que la imagen se estire con el texto */
+}
+
 #banner .image {
   width: 40%;          /* más estrecho, como en la demo */
   margin: 0 0 2em 3em; /* margen más pequeño */
+  align-self: flex-start;
 }
 
 #banner .image img {
   width: 100%;
   height: auto;        /* que mantenga proporciones */
-  object-fit: cover;   /* recorta si hace falta */
+  object-fit: contain; /* evita recorte */
   border-radius: 0.375em;
+}
+
+/* Responsive banner: tablet y mobile */
+@media screen and (max-width: 980px) {
+  #banner {
+    padding: 4.5em 0 3em 0;
+    flex-direction: column-reverse;
+    gap: 1.5em;
+  }
+
+  #banner .content,
+  #banner .image {
+    width: 100%;
+  }
+
+  #banner .image {
+    margin: 0;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+  }
+
+  #banner .image img {
+    height: auto;
+    max-height: 60vh;
+    object-fit: contain;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  #banner {
+    padding: 3.5em 0 2.5em 0;
+    gap: 1.2em;
+  }
+
+  #banner .image img {
+    max-height: 45vh;
+  }
 }
 
 
@@ -2562,7 +2609,4 @@ header.major > p,
   border-radius: 15px;
   margin-top: 0.5rem;
 }
-
-
-
 
