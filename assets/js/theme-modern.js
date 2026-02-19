@@ -155,9 +155,214 @@
     window.setTimeout(step, 520);
   }
 
+  function initFeaturedCarousel() {
+    var carousels = document.querySelectorAll('[data-fp-carousel]');
+    if (!carousels.length) return;
+
+    carousels.forEach(function (carousel) {
+      var viewport = carousel.querySelector('.fp-carousel__viewport');
+      var track = carousel.querySelector('.fp-carousel__track');
+      var prevButton = carousel.querySelector('[data-fp-prev]');
+      var nextButton = carousel.querySelector('[data-fp-next]');
+      if (!viewport || !track || !prevButton || !nextButton) return;
+
+      var originalCards = Array.prototype.slice.call(track.children);
+      if (originalCards.length < 2) return;
+
+      var transitionValue = 'transform 760ms cubic-bezier(0.22, 0.74, 0.21, 1)';
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var autoplayDelay = 4600;
+      var autoplayId = null;
+      var paused = false;
+      var index = 0;
+      var cardWidth = 0;
+      var gapWidth = 0;
+      var resizeTimeout = null;
+      var isAnimating = false;
+      var cloneCount = 0;
+
+      function getPerView() {
+        var raw = window.getComputedStyle(carousel).getPropertyValue('--fp-per-view');
+        var parsed = parseInt(raw, 10);
+        return parsed > 0 ? parsed : 1;
+      }
+
+      function getGap() {
+        var styles = window.getComputedStyle(track);
+        var raw = styles.columnGap || styles.gap || '0';
+        var parsed = parseFloat(raw);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      function disableCloneFocus(card) {
+        card.setAttribute('aria-hidden', 'true');
+        var focusables = card.querySelectorAll('a, button, input, select, textarea, [tabindex]');
+        focusables.forEach(function (node) {
+          node.setAttribute('tabindex', '-1');
+        });
+      }
+
+      cloneCount = Math.min(originalCards.length, Math.max(3, getPerView()));
+      index = cloneCount;
+
+      var prependFragment = document.createDocumentFragment();
+      var appendFragment = document.createDocumentFragment();
+      var prependStart = originalCards.length - cloneCount;
+
+      for (var i = prependStart; i < originalCards.length; i += 1) {
+        var prependClone = originalCards[i].cloneNode(true);
+        disableCloneFocus(prependClone);
+        prependFragment.appendChild(prependClone);
+      }
+
+      for (var j = 0; j < cloneCount; j += 1) {
+        var appendClone = originalCards[j].cloneNode(true);
+        disableCloneFocus(appendClone);
+        appendFragment.appendChild(appendClone);
+      }
+
+      track.insertBefore(prependFragment, track.firstChild);
+      track.appendChild(appendFragment);
+
+      function allCards() {
+        return Array.prototype.slice.call(track.children);
+      }
+
+      function setCardWidths() {
+        var perView = getPerView();
+        gapWidth = getGap();
+        cardWidth = (viewport.clientWidth - gapWidth * (perView - 1)) / perView;
+
+        allCards().forEach(function (card) {
+          card.style.flexBasis = cardWidth + 'px';
+        });
+      }
+
+      function setTrackPosition(animate) {
+        var shouldAnimate = animate !== false && !reduceMotion;
+        track.style.transition = shouldAnimate ? transitionValue : 'none';
+        var offset = index * (cardWidth + gapWidth);
+        track.style.transform = 'translate3d(' + -offset + 'px, 0, 0)';
+
+        if (!shouldAnimate) {
+          track.offsetHeight;
+          track.style.transition = transitionValue;
+          isAnimating = false;
+        } else {
+          isAnimating = true;
+        }
+      }
+
+      function normalizeLoop() {
+        if (index < cloneCount) {
+          index += originalCards.length;
+          setTrackPosition(false);
+        }
+
+        if (index >= originalCards.length + cloneCount) {
+          index -= originalCards.length;
+          setTrackPosition(false);
+        }
+
+        isAnimating = false;
+      }
+
+      function next() {
+        if (isAnimating) return;
+        index += 1;
+        setTrackPosition(true);
+        if (reduceMotion) normalizeLoop();
+      }
+
+      function prev() {
+        if (isAnimating) return;
+        index -= 1;
+        setTrackPosition(true);
+        if (reduceMotion) normalizeLoop();
+      }
+
+      function stopAutoplay() {
+        if (!autoplayId) return;
+        window.clearInterval(autoplayId);
+        autoplayId = null;
+      }
+
+      function startAutoplay() {
+        if (reduceMotion) return;
+        stopAutoplay();
+        autoplayId = window.setInterval(function () {
+          if (paused) return;
+          next();
+        }, autoplayDelay);
+      }
+
+      function setPaused(value) {
+        paused = value;
+        if (paused) {
+          stopAutoplay();
+          return;
+        }
+        startAutoplay();
+      }
+
+      nextButton.addEventListener('click', function () {
+        next();
+        if (!paused) startAutoplay();
+      });
+
+      prevButton.addEventListener('click', function () {
+        prev();
+        if (!paused) startAutoplay();
+      });
+
+      carousel.addEventListener('mouseenter', function () {
+        setPaused(true);
+      });
+
+      carousel.addEventListener('mouseleave', function () {
+        setPaused(false);
+      });
+
+      carousel.addEventListener('focusin', function () {
+        setPaused(true);
+      });
+
+      carousel.addEventListener('focusout', function (event) {
+        if (carousel.contains(event.relatedTarget)) return;
+        setPaused(false);
+      });
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+          stopAutoplay();
+          return;
+        }
+        if (!paused) startAutoplay();
+      });
+
+      track.addEventListener('transitionend', function (event) {
+        if (event.propertyName !== 'transform') return;
+        normalizeLoop();
+      });
+
+      window.addEventListener('resize', function () {
+        window.clearTimeout(resizeTimeout);
+        resizeTimeout = window.setTimeout(function () {
+          setCardWidths();
+          setTrackPosition(false);
+        }, 120);
+      });
+
+      setCardWidths();
+      setTrackPosition(false);
+      startAutoplay();
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initThemeToggle();
     initTabs();
     initTyping();
+    initFeaturedCarousel();
   });
 })();

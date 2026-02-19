@@ -1,0 +1,39 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract cyber visual for Quantum Price Regression">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#050608"/>
+      <stop offset="100%" stop-color="#13161d"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="56%">
+      <stop offset="0%" stop-color="#ffd60a" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#ffd60a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse">
+      <path d="M56 0H0V56" fill="none" stroke="#665100" stroke-opacity="0.14" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <rect width="1600" height="1000" fill="url(#grid)"/>
+  <ellipse cx="800" cy="500" rx="420" ry="295" fill="url(#glow)"/>
+
+  <g fill="none" stroke="#ffd60a" stroke-width="2.3" stroke-opacity="0.78">
+    <polygon points="800,245 1030,500 800,755 570,500"/>
+    <polygon points="800,330 945,500 800,670 655,500" stroke-opacity="0.52"/>
+    <path d="M570 500 H1030"/>
+    <path d="M800 245 V755"/>
+  </g>
+
+  <g stroke="#ffd60a" stroke-width="2.9" stroke-opacity="0.86" fill="none" stroke-linecap="round">
+    <path d="M420 620 C560 580, 670 510, 790 468 S1030 380, 1180 290"/>
+  </g>
+
+  <g fill="#ffd60a" fill-opacity="0.88">
+    <circle cx="420" cy="620" r="8"/><circle cx="560" cy="575" r="8"/><circle cx="700" cy="510" r="8"/>
+    <circle cx="830" cy="455" r="8"/><circle cx="1000" cy="390" r="8"/><circle cx="1180" cy="290" r="8"/>
+  </g>
+
+  <g stroke="#7f6600" stroke-opacity="0.34" stroke-width="2" fill="none">
+    <path d="M95 760 C315 650, 550 800, 790 680 S1240 560, 1515 725"/>
+    <path d="M75 850 C325 745, 560 900, 810 790 S1260 675, 1525 820"/>
+  </g>
+</svg>

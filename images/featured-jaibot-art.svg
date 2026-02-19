@@ -1,0 +1,45 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract cyber visual for JAIBOT Art">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#050608"/>
+      <stop offset="100%" stop-color="#13161d"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="54%">
+      <stop offset="0%" stop-color="#ffd60a" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ffd60a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse">
+      <path d="M56 0H0V56" fill="none" stroke="#665100" stroke-opacity="0.14" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <rect width="1600" height="1000" fill="url(#grid)"/>
+  <ellipse cx="800" cy="500" rx="410" ry="285" fill="url(#glow)"/>
+
+  <g fill="none" stroke="#ffd60a" stroke-width="2.2" stroke-opacity="0.78">
+    <rect x="610" y="305" width="380" height="390" rx="30"/>
+    <rect x="690" y="385" width="220" height="230" rx="22" stroke-opacity="0.5"/>
+    <path d="M650 360 H950"/>
+    <path d="M650 640 H950"/>
+    <path d="M800 325 V675"/>
+  </g>
+
+  <g fill="none" stroke="#ffd60a" stroke-width="2.5" stroke-opacity="0.86" stroke-linecap="round">
+    <path d="M800 252 l0 -72"/>
+    <path d="M620 328 l-52 -45"/>
+    <path d="M980 328 l52 -45"/>
+    <path d="M620 672 l-62 52"/>
+    <path d="M980 672 l62 52"/>
+  </g>
+
+  <g fill="#ffd60a" fill-opacity="0.88">
+    <circle cx="800" cy="180" r="7"/><circle cx="568" cy="283" r="7"/><circle cx="1032" cy="283" r="7"/>
+    <circle cx="558" cy="724" r="7"/><circle cx="1042" cy="724" r="7"/>
+    <circle cx="800" cy="500" r="8"/>
+  </g>
+
+  <g stroke="#7f6600" stroke-opacity="0.36" stroke-width="2" fill="none">
+    <path d="M90 760 C350 630, 540 820, 800 690 S1240 560, 1510 730"/>
+    <path d="M70 850 C340 730, 560 900, 820 780 S1250 690, 1530 820"/>
+  </g>
+</svg>

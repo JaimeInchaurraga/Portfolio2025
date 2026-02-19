@@ -1,0 +1,45 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract cyber visual for Credit Score">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#050608"/>
+      <stop offset="100%" stop-color="#13161d"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="56%">
+      <stop offset="0%" stop-color="#ffd60a" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#ffd60a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse">
+      <path d="M56 0H0V56" fill="none" stroke="#665100" stroke-opacity="0.14" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <rect width="1600" height="1000" fill="url(#grid)"/>
+  <ellipse cx="800" cy="500" rx="420" ry="295" fill="url(#glow)"/>
+
+  <g fill="none" stroke="#ffd60a" stroke-width="2.3" stroke-opacity="0.78">
+    <circle cx="800" cy="500" r="230"/>
+    <circle cx="800" cy="500" r="165" stroke-opacity="0.5"/>
+    <circle cx="800" cy="500" r="102" stroke-opacity="0.38"/>
+  </g>
+
+  <g fill="none" stroke="#ffd60a" stroke-width="3" stroke-opacity="0.86" stroke-linecap="round">
+    <path d="M610 610 C680 545, 735 520, 800 500"/>
+    <path d="M800 500 C890 475, 965 435, 1040 360"/>
+  </g>
+
+  <g fill="#ffd60a" fill-opacity="0.88">
+    <circle cx="610" cy="610" r="8"/><circle cx="690" cy="540" r="8"/><circle cx="800" cy="500" r="8"/>
+    <circle cx="910" cy="452" r="8"/><circle cx="1040" cy="360" r="8"/>
+  </g>
+
+  <g stroke="#ffd60a" stroke-opacity="0.68" stroke-width="2.2" fill="none">
+    <path d="M740 405 H850"/>
+    <path d="M735 500 H915"/>
+    <path d="M740 595 H860"/>
+  </g>
+
+  <g stroke="#7f6600" stroke-opacity="0.34" stroke-width="2" fill="none">
+    <path d="M100 760 C315 640, 540 790, 780 670 S1240 560, 1495 730"/>
+    <path d="M85 850 C320 740, 560 900, 800 790 S1260 675, 1515 820"/>
+  </g>
+</svg>
